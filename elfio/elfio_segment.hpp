@@ -111,6 +111,9 @@ class segment
     //! \brief Check if the offset is initialized
     //! \return True if the offset is initialized, false otherwise
     virtual bool is_offset_initialized() const = 0;
+    //------------------------------------------------------------------------------
+    //! \brief Sort sections in a segment according to address
+    virtual void sort_sections( std::vector<Elf64_Addr>& addrs ) = 0;
 
   protected:
     //------------------------------------------------------------------------------
@@ -380,6 +383,14 @@ template <class T> class segment_impl : public segment
     //! \brief Set the stream size
     //! \param value Stream size
     void set_stream_size( size_t value ) { stream_size = value; }
+    //------------------------------------------------------------------------------
+    //! \brief Sort sections in a segment according to address
+    virtual void sort_sections( std::vector<Elf64_Addr> &addrs )
+    {
+        std::sort( sections.begin(), sections.end(), [&]( Elf_Half& a, Elf_Half& b) {
+            return addrs[a] < addrs[b];
+        } );
+    }
 
     //------------------------------------------------------------------------------
   private:
